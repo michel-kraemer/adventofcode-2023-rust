@@ -20,14 +20,11 @@ fn fill_grid(
     let mut vertical_sides = Vec::new();
 
     let mut queue = VecDeque::new();
-    queue.push_back((sx, sy, grid[sy as usize * width + sx as usize]));
+    queue.push_back((sx, sy));
+    seen[sy as usize * width + sx as usize] = true;
 
-    while let Some((x, y, c)) = queue.pop_front() {
-        if seen[y as usize * width + x as usize] {
-            continue;
-        }
-        seen[y as usize * width + x as usize] = true;
-
+    while let Some((x, y)) = queue.pop_front() {
+        let c = grid[y as usize * width + x as usize];
         area += 1;
 
         for d in [(1, 0), (-1, 0), (0, 1), (0, -1)] {
@@ -39,7 +36,10 @@ fn fill_grid(
                 && ny < height as i32
                 && grid[ny as usize * width + nx as usize] == c
             {
-                queue.push_back((nx, ny, c));
+                if !seen[ny as usize * width + nx as usize] {
+                    seen[ny as usize * width + nx as usize] = true;
+                    queue.push_back((nx, ny));
+                }
             } else if d == (1, 0) || d == (-1, 0) {
                 vertical_sides.push((y, x * 4 + d.0));
             } else {
